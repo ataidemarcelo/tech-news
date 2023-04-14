@@ -38,7 +38,12 @@ def scrape_updates(html_content):
 
 # Requisito 3
 def scrape_next_page_link(html_content):
-    """Seu código deve vir aqui"""
+    soup = BeautifulSoup(html_content, "html.parser")
+    next_page_link_element = soup.find("a", {"class": "next"})
+    if next_page_link_element:
+        next_page_link = next_page_link_element["href"]
+        return next_page_link
+    return None
 
 
 # Requisito 4
@@ -53,5 +58,5 @@ def get_tech_news(amount):
 
 # if __name__ == '__main__':
 #     html_content = fetch(BASE_URL)
-#     links = scrape_updates(html_content)
-#     print(links)
+#     link = scrape_next_page_link(html_content)
+#     print(link)
