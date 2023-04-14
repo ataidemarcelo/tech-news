@@ -1,6 +1,6 @@
-# Requisito 1
 import requests
 import time
+from bs4 import BeautifulSoup
 
 BASE_URL = 'https://blog.betrybe.com/'
 
@@ -18,14 +18,22 @@ def fetch(url):
         time.sleep(1)
 
         if response.status_code == 200:
-            return response.text
+            html_content = response.text
+            return html_content
     except requests.ReadTimeout:
         return None
 
 
 # Requisito 2
 def scrape_updates(html_content):
-    """Seu código deve vir aqui"""
+    soup = BeautifulSoup(html_content, "html.parser")
+    news_list = soup.find_all("article", {"class": "entry-preview"})
+    list_links_to_news_pages = []
+    for news in news_list:
+        link = news.find("a")["href"]
+        list_links_to_news_pages.append(link)
+
+    return list_links_to_news_pages
 
 
 # Requisito 3
@@ -44,5 +52,6 @@ def get_tech_news(amount):
 
 
 # if __name__ == '__main__':
-#     res = fetch(BASE_URL)
-#     print(res)
+#     html_content = fetch(BASE_URL)
+#     links = scrape_updates(html_content)
+#     print(links)
