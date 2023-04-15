@@ -1,6 +1,7 @@
 import requests
 import time
 from bs4 import BeautifulSoup
+from tech_news.database import create_news
 
 BASE_URL = 'https://blog.betrybe.com/'
 
@@ -65,15 +66,51 @@ def scrape_news(html_content):
 
 # Requisito 5
 def get_tech_news(amount):
-    """Seu código deve vir aqui"""
+    html_content = fetch(BASE_URL)
+    list_links_to_news_pages = scrape_updates(html_content)
+    next_page_link = scrape_next_page_link(html_content)
+    news_dict_list = []
+
+    all_links_to_new_page = []
+    all_links_to_new_page.extend(list_links_to_news_pages)
+
+    while amount > len(all_links_to_new_page):
+        html_content = fetch(next_page_link)
+        list_links_to_news_pages = scrape_updates(html_content)
+
+        all_links_to_new_page.extend(list_links_to_news_pages)
+        next_page_link = scrape_next_page_link(html_content)
+
+    for index in range(amount):
+        html_content = fetch(all_links_to_new_page[index])
+        news_dict = scrape_news(html_content)
+        news_dict_list.append(news_dict)
+
+    create_news(news_dict_list)
+
+    return news_dict_list
 
 
 # if __name__ == '__main__':
 #     html_content = fetch(BASE_URL)
-#     soup = BeautifulSoup(html_content, "html.parser")
-#     news_list = soup.find_all("article", {"class": "entry-preview"})
-#     url = news_list[0].h2.a["href"]
-#     print(url)
-#     new_html_content = fetch(url)
-#     dict_news = scrape_news(new_html_content)
-#     print(dict_news)
+#     list_links_to_news_pages = scrape_updates(html_content)
+#     next_page_link = scrape_next_page_link(html_content)
+#     news_dict_list = []
+
+#     amount = 30
+#     all_links_to_new_page = []
+#     all_links_to_new_page.extend(list_links_to_news_pages)
+
+#     while amount > len(all_links_to_new_page):
+#         html_content = fetch(next_page_link)
+#         list_links_to_news_pages = scrape_updates(html_content)
+
+#         all_links_to_new_page.extend(list_links_to_news_pages)
+#         next_page_link = scrape_next_page_link(html_content)
+#     print(len(all_links_to_new_page))
+#     for index in range(amount):
+#         html_content = fetch(all_links_to_new_page[index])
+#         news = scrape_news(html_content)
+#         news_dict_list.append(news)
+
+#     create_news(news_dict_list)
