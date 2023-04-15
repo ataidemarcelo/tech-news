@@ -11,7 +11,7 @@ HEADERS = {"user-agent": "Fake user-agent"}
 def fetch(url):
     try:
         response = requests.get(
-            BASE_URL,
+            url,
             headers=HEADERS,
             timeout=3
         )
@@ -48,7 +48,19 @@ def scrape_next_page_link(html_content):
 
 # Requisito 4
 def scrape_news(html_content):
-    """Seu código deve vir aqui"""
+    soup = BeautifulSoup(html_content, "html.parser")
+    reading_time_text = soup.find("li", {"class": "meta-reading-time"}).text
+    reading_time = int(reading_time_text.split()[0])
+
+    return {
+        "url": soup.find("link", {"rel": "canonical"})["href"],
+        "title": soup.find("h1", {"class": "entry-title"}).text.rstrip(),
+        "timestamp": soup.find("li", {"class": "meta-date"}).text,
+        "writer": soup.find("span", {"class": "author"}).text,
+        "reading_time": reading_time,
+        "summary": soup.find("p").text.rstrip(),
+        "category": soup.find("span", {"class": "label"}).text,
+    }
 
 
 # Requisito 5
@@ -58,5 +70,10 @@ def get_tech_news(amount):
 
 # if __name__ == '__main__':
 #     html_content = fetch(BASE_URL)
-#     link = scrape_next_page_link(html_content)
-#     print(link)
+#     soup = BeautifulSoup(html_content, "html.parser")
+#     news_list = soup.find_all("article", {"class": "entry-preview"})
+#     url = news_list[0].h2.a["href"]
+#     print(url)
+#     new_html_content = fetch(url)
+#     dict_news = scrape_news(new_html_content)
+#     print(dict_news)
